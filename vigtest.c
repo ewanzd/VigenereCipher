@@ -14,8 +14,6 @@
 #include "viglib.h"
 
 int main(int argc, char **argv) {
-    argp_parse (&argp, argc, argv, 0, 0, 0);
-
     char text[] = "PingPong";
     int textSize = strlen(text);
     char passphrase[] = "Hello";
