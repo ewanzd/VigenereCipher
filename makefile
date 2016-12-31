@@ -2,22 +2,24 @@
 CC=gcc
 # Pass flags to the compiler
 CFLAGS=-c -g
+# Pass flags for linking
+LDFLAGS=
 # All sources to compile
-SOURCES=viglib.c vigtest.c
+SOURCES=viglib.c vigmain.c
 # All ObjectFiles to link
 OBJECTS=$(SOURCES:.c=.o)
 # Executable file
-EXECUTABLE=vigenere.exe
-# Change "del" to "rm" for linux
+EXEC=vigenere.exe
+# Change "del"(windows) to "rm" for linux
 DELETECMD=del
 
-all: $(EXECUTABLE)
+all: $(EXEC)
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) -o $(EXECUTABLE) $(OBJECTS)
+$(EXEC): $(OBJECTS)
+	$(CC) -o $(EXEC) $(OBJECTS)  $(LDFLAGS)
 
 .c.o:
 	$(CC) $(CFLAGS) $<
 
 clean:
-	$(DELETECMD) -rf $(OBJECTS) $(EXECUTABLE)
+	$(DELETECMD) -rf $(OBJECTS) $(EXEC)
