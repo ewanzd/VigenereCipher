@@ -37,7 +37,7 @@ typedef enum {
 // entry point
 int main(int argc, char **argv) {
     // default mode(no extra argument)
-    vigmode vigenere_mode = DECIPHER;
+    vigmode vigenere_mode = ENCIPHER;
 
     // analyse arguments ...
     char path[SIZE_PATH] = "test.txt";
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
             char* passphrase = getPassphrase();
 
             // encipher file content with passphrase
-            encipher_vigenere(file_data, passphrase);
+            vig_encipher(file_data, passphrase);
 
             // create path for new file
             strcat(path, TXT_FILEATT);
@@ -68,8 +68,8 @@ int main(int argc, char **argv) {
             // get passphrase from user
             char* passphrase = getPassphrase();
 
-            // encipher file content with passphrase
-            decipher_vigenere(file_data, passphrase);
+            // decipher file content with passphrase
+            vig_decipher(file_data, passphrase);
 
             // create path for new file(remove '.encrypted')
             int len = strlen(path);

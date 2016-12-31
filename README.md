@@ -1,4 +1,4 @@
-# VigenereCipher
+# Vigenère cipher
 
 A school project to create a binary Vigenère cipher in C.
 
