@@ -14,7 +14,8 @@
 #include <stdlib.h>
 #include "viglib.h"
 
-#define TXT_PASSPHRASE "What is your passphrase"
+#define TXT_PHRASEIN "What is your passphrase"
+#define TXT_PHRASEOUT "The pass phrase used was"
 #define TXT_CANTOPEN "Can't open file!"
 #define TXT_FILEATT ".encrypted"
 
@@ -26,30 +27,56 @@ char* file_read(char*);
 void file_write(char*, char*);
 void error(char*);
 
+// enum with three modes determine by arguments
 typedef enum {
     ENCIPHER,
     DECIPHER,
     HACK
 } vigmode;
 
+// entry point
 int main(int argc, char **argv) {
     // default mode(no extra argument)
-    vigmode vigenere_mode = ENCIPHER;
+    vigmode vigenere_mode = DECIPHER;
 
-    // analyse arguments
+    // analyse arguments ...
     char path[SIZE_PATH] = "test.txt";
 
     // analyse
     switch (vigenere_mode) {
         case ENCIPHER: {
+            // get content from file
+            char* file_data = file_read(path);
+
+            // get passphrase from user
             char* passphrase = getPassphrase();
-            char* data = file_read(path);
-            encipher_vigenere(data, passphrase);
+
+            // encipher file content with passphrase
+            encipher_vigenere(file_data, passphrase);
+
+            // create path for new file
             strcat(path, TXT_FILEATT);
-            file_write(path, data);
+
+            // output file with encrypted data
+            file_write(path, file_data);
             break;
         }
         case DECIPHER: {
+            // get content from file
+            char* file_data = file_read(path);
+
+            // get passphrase from user
+            char* passphrase = getPassphrase();
+
+            // encipher file content with passphrase
+            decipher_vigenere(file_data, passphrase);
+
+            // create path for new file(remove '.encrypted')
+            int len = strlen(path);
+            path[len - 10] = '\0';
+
+            // output file with encrypted data
+            file_write(path, file_data);
             break;
         }
         case HACK: {
@@ -60,55 +87,78 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+// get user input with passphrase as char array
 char* getPassphrase() {
+    // allocate new space for passphrase
     char* passphrase = (char*)malloc(sizeof(char) * SIZE_PHRASE);
-    printf("%s? ", TXT_PASSPHRASE);
+
+    // ask for passphrase
+    printf("%s? ", TXT_PHRASEIN);
+
+    // read user input from console
     scanf("%s", passphrase);
+
+    // return char array
     return passphrase;
 }
 
+// get content from file 'file_name' as char array
 char* file_read(char* file_name) {
+    // declare variables to default value
     FILE *file_pointer = NULL;
     char *buffer = NULL;
     size_t size = 0;
 
-    // Open file in read-only mode
-    file_pointer = fopen(file_name, 'r');
+    // open file in read-only mode
+    file_pointer = fopen(file_name, "r");
 
-    // Cant open fail(not available?)
+    // can't open file(not available?)
     if (!file_pointer) {
         error(TXT_CANTOPEN);
     }
 
-    // Get the buffer size
+    // get the buffer size
     fseek(file_pointer, 0L, SEEK_END);
     size = ftell(file_pointer);
 
-    // Set position of stream to the beginning
+    // set position of stream to the beginning
     rewind(file_pointer);
 
-    // Allocate the buffer (no need to initialize it with calloc)
+    // allocate the buffer
     // size + 1 byte for the \0
     buffer = malloc((size + 1) * sizeof(*buffer));
 
-    // Read the file into the buffer
-    // Read 1 chunk of size bytes from file_pointer into buffer
+    // read the file into the buffer
+    // read 1 chunk of size bytes from file_pointer into buffer
     fread(buffer, size, 1, file_pointer);
 
     // NULL-terminate the buffer
     buffer[size] = '\0';
 
+    // close file stream
     fclose(file_pointer);
+
+    // return char array
     return buffer;
 }
 
+// write char array to file(need /0 at end!)
 void file_write(char* file_name, char* content) {
-    FILE *file_pointer = fopen(file_name, 'w');
+    // Create file and open
+    FILE *file_pointer = fopen(file_name, "w");
+
+    // put char array to file
     fprintf(file_pointer, content);
+
+    // close file
     fclose(file_pointer);
 }
 
+// put message to console and exit program
 void error(char* message) {
+    // put message to console
     puts(message);
+
+    // exit program
     exit(1);
 }
