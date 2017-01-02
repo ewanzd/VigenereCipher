@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     // analyse arguments
     vigargs* args = args_analyse(argc, argv);
 
-    // run vigenere
+    // run vigenere based on arguments
     vig_run(args);
 
     // all worked correctly
