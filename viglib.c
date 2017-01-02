@@ -5,35 +5,64 @@
 // - passphrase will begin on start if loop reach the end
 // - modulo 256
 
-#include <stdbool.h>
-#include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
-void cipher(char[], int, char[], int, bool);
+void cipher(char[], size_t, char[], size_t, unsigned short);
 
+/*
+*
+*/
 void vig_encipher(char text[], char passphrase[]) {
-    int textSize = strlen(text);
-    int passphraseSize = strlen(passphrase);
-    cipher(text, textSize, passphrase, passphraseSize, true);
+    //
+    size_t text_len = strlen(text);
+
+    //
+    size_t passphrase_len = strlen(passphrase);
+
+    //
+    cipher(text, text_len, passphrase, passphrase_len, 1);
 }
 
+/*
+*
+*/
 void vig_decipher(char text[], char passphrase[]) {
-    int textSize = strlen(text);
-    int passphraseSize = strlen(passphrase);
-    cipher(text, textSize, passphrase, passphraseSize, false);
+    //
+    size_t text_len = strlen(text);
+
+    //
+    size_t passphrase_len = strlen(passphrase);
+
+    //
+    cipher(text, text_len, passphrase, passphrase_len, 0);
 }
 
-void cipher(char text[], int textSize, char passphrase[], int passphraseSize, bool encipher) {
+/*
+*
+*/
+void cipher(char text[], size_t text_len, char passphrase[], size_t passphrase_len, unsigned short encipher) {
+    // declare counters
     int i, j;
-    for (i = 0, j = 0; i < textSize; i++) {
+
+    // loop every byte in text
+    for (i = 0, j = 0; i < text_len; i++) {
+        // get position from passphrase
         unsigned short c = passphrase[j];
+
+        // plus if encipher and minus if decipher
         c = text[i] + ((encipher) ? c : -c);
+
+        // char can't be bigger than 256
         text[i] = c % 256;
-        if(j++ == passphraseSize) j = 0;
+
+        // reset passphrase counter
+        if(j++ == passphrase_len) j = 0;
     }
 }
 
-char* getPassphrase__vigenere(char clearText[], int clearTextSize, char encryptedText[], int encryptedTextSize) {
+/*
+*
+*/
+char* vig_passphrase(char clearText[], char encryptedText[]) {
 
 }

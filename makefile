@@ -2,7 +2,7 @@
 CC=gcc
 # Pass flags to the compiler
 CFLAGS=-c -g
-# Pass flags for linking
+# Pass flags to the linker
 LDFLAGS=
 # All sources to compile
 SOURCES=viglib.c vigmain.c
