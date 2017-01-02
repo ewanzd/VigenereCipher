@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
 #include "viglib.h"
 
 // constants
@@ -74,7 +75,7 @@ int main(int argc, char **argv) {
 }
 
 /*
-* analyse arguments from user
+* analyse arguments from user and check if is valid
 */
 vigargs* args_analyse(int argc, char **argv) {
     // it need at least one additional argument
@@ -279,7 +280,7 @@ int strend(const char *string, const char *endwith) {
         return (0 == memcmp(endwith, string + (string_len - endwith_len), endwith_len));
     }
 
-    // len_string was shorter than len_endwith
+    // string_len was shorter than endwith_len
     return 0;
 }
 
