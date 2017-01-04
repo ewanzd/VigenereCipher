@@ -1,9 +1,13 @@
-// 1) clear text + passphrase = encrypted text
-// 2) encrypted text - passphrase = clear text
-// 3) encrypted text - clear text = passphrase
-
-// - passphrase will begin on start if loop reach the end
-// - modulo 256
+/*
+* @author Danilo Wanzenried
+*
+* @desc File help to encipher and decipher files with 'vigenere cipher'. It is
+* possible too to hack the passphrase with clear and encrypted file.
+*
+* 1) clear text + passphrase = encrypted text
+* 2) encrypted text - passphrase = clear text
+* 3) encrypted text - clear text = passphrase
+*/
 
 #include <string.h>
 
