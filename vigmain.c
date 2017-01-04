@@ -1,13 +1,11 @@
 /*
-* FILENAME: vigmain.c
-* AUTHOR: Danilo Wanzenried
-* LAST CHANGE: 02.01.2017
+* @author Danilo Wanzenried
+* @required viglib.c
 *
-* DESCRIPTION:
-* File help to encipher and decipher files with 'vigenere cipher'. It is
+* @desc File help to encipher and decipher files with 'vigenere cipher'. It is
 * possible too to hack the passphrase with clear and encrypted file.
 *
-* EXAMPLES:
+* Examples:
 * Encipher(create for example image.png.encrypted)
 * $ vigenere image.png
 * What is your passphrase? MyComplexPassphrase
@@ -32,6 +30,7 @@
 #define TXT_CANTOPEN "Can't open file!"
 #define TXT_NOTENOUGHARGS "There aren't enough arguments!"
 #define TXT_WRONGFILEEND "File must end with '.encrypted'!"
+#define TXT_FILESNOTSAMELEN "Files haven't the same len!"
 #define TXT_FILEATT ".encrypted"
 
 #define MAXSIZE_PHRASE 64
@@ -61,9 +60,13 @@ int strend(const char*, const char*);
 void error(const char*);
 
 /*
-* entry point
+* @desc entry point from this program
+* @param int argc - count of arguments
+* @param char **argv - all arguments as string
+* @return int - exit number mean, if the program finish successful
 */
 int main(int argc, char **argv) {
+
     // analyse arguments
     vigargs* args = args_analyse(argc, argv);
 
@@ -75,9 +78,14 @@ int main(int argc, char **argv) {
 }
 
 /*
-* analyse arguments from user and check if is valid
+* @desc analyse arguments from user and is responsible to check
+* if the input is valid.
+* @param int argc - count of arguments
+* @param char **argv - all arguments as string
+* @return vigargs* - a categorized structure with all arguments
 */
 vigargs* args_analyse(int argc, char **argv) {
+
     // it need at least one additional argument
     if(argc < 2) error(TXT_NOTENOUGHARGS);
 
@@ -86,6 +94,7 @@ vigargs* args_analyse(int argc, char **argv) {
 
     // analyse arguments and set values
     if (strcmp(argv[1], "-d") == 0) {
+
         // array need at least 2 arguments
         if(argc < 3) error(TXT_NOTENOUGHARGS);
 
@@ -98,6 +107,7 @@ vigargs* args_analyse(int argc, char **argv) {
         // copy path to encrypt file to structure
         strcpy(app_arguments->path_cipher, argv[2]);
     } else if (strcmp(argv[1], "-hack") == 0) {
+
         // array need at least 3 arguments
         if(argc < 4) error(TXT_NOTENOUGHARGS);
 
@@ -113,6 +123,7 @@ vigargs* args_analyse(int argc, char **argv) {
         // copy path to encrypt file to structure
         strcpy(app_arguments->path_cipher, argv[3]);
     } else {
+
         // set mode to encipher
         app_arguments->vigenere_mode = ENCIPHER;
 
@@ -125,12 +136,15 @@ vigargs* args_analyse(int argc, char **argv) {
 }
 
 /*
-* get data from file, de-/encipher data and save to new file
+* @desc get data from file, de-/encipher data and save to new file
+* @param vigargs *args - structure with a description what to do
 */
-void vig_run(vigargs* args) {
+void vig_run(vigargs *args) {
+
     // analyse
     switch (args->vigenere_mode) {
         case ENCIPHER: {
+
             // get content(pointer to buffer stream) from file
             char *data_clear = file_read(args->path_clear);
 
@@ -152,6 +166,7 @@ void vig_run(vigargs* args) {
             break;
         }
         case DECIPHER: {
+
             // get pointer to buffer stream from file
             char *data_cipher = file_read(args->path_cipher);
 
@@ -167,7 +182,7 @@ void vig_run(vigargs* args) {
             // find len of string
             int len = strlen(args->path_clear);
 
-            // remove .encrypted from path(set NULL on point .)
+            // remove .encrypted from path(set NULL on point '.')
             args->path_clear[len - 10] = '\0';
 
             // output file with encrypted data
@@ -175,6 +190,7 @@ void vig_run(vigargs* args) {
             break;
         }
         case HACK: {
+
             // get pointer to buffer stream from file with clear text
             char *data_clear = file_read(args->path_clear);
 
@@ -182,7 +198,13 @@ void vig_run(vigargs* args) {
             char *data_cipher = file_read(args->path_cipher);
 
             // find passphrase with clear and encrypted text
-            char *passphrase = vig_passphrase(data_clear, data_cipher);
+            char *passphrase = (char*)malloc(sizeof(char) * MAXSIZE_PHRASE);
+
+            // get passphrase with both byte arrays
+            int error_code = vig_passphrase(passphrase, data_clear, data_cipher);
+
+            // error while get passphrase
+            if(error_code != 0) error(TXT_FILESNOTSAMELEN);
 
             // print result to console
             printf("%s: %s\n", TXT_PHRASEOUT, passphrase);
@@ -192,9 +214,11 @@ void vig_run(vigargs* args) {
 }
 
 /*
-* get user input with passphrase as char array
+* @desc get user input with passphrase as char array
+* @return char* - a string with passphrase from user
 */
 char* get_passphrase() {
+
     // allocate new space for passphrase
     char *passphrase = (char*)malloc(sizeof(char) * MAXSIZE_PHRASE);
 
@@ -209,9 +233,12 @@ char* get_passphrase() {
 }
 
 /*
-* get content from file 'file_name' as char array
+* @desc get content from file 'file_name' as char array
+* @param const char *file_name - file name(and path) to file for read
+* @return char* - content from file as char(byte) array
 */
-char* file_read(const char* file_name) {
+char* file_read(const char *file_name) {
+
     // declare variables to default value
     FILE *file_pointer = NULL;
     char *buffer = NULL;
@@ -225,8 +252,10 @@ char* file_read(const char* file_name) {
         error(TXT_CANTOPEN);
     }
 
-    // get the buffer size
+    // set pointer to end of file
     fseek(file_pointer, 0L, SEEK_END);
+
+    // get the buffer size
     size = ftell(file_pointer);
 
     // set position of stream to the beginning
@@ -251,9 +280,12 @@ char* file_read(const char* file_name) {
 }
 
 /*
-* write char array to file(need NULL at the end!)
+* @desc write char array to file
+* @param const char *file_name - file name(and path) to file for write
+* @param const char *content - char(byte) array for write to file
 */
-void file_write(const char* file_name, const char* content) {
+void file_write(const char *file_name, const char *content) {
+
     // Create file and open
     FILE *file_pointer = fopen(file_name, "w");
 
@@ -265,9 +297,13 @@ void file_write(const char* file_name, const char* content) {
 }
 
 /*
-* check end of string is equal
+* @desc check end of string is equal
+* @param const char *string - full string
+* @param const char *endwith - string whose full string should end with
+* @return int - 1 if equal, 0 not equal
 */
 int strend(const char *string, const char *endwith) {
+
     // get len of string
     size_t string_len = strlen(string);
 
@@ -275,7 +311,7 @@ int strend(const char *string, const char *endwith) {
     size_t endwith_len = strlen(endwith);
 
     // check if 'string' is equal or bigger than 'endwith'
-    if (string_len >= len_endwith) {
+    if (string_len >= endwith_len) {
         // check if the last part of 'string' is equal 'endwith', then return 1
         return (0 == memcmp(endwith, string + (string_len - endwith_len), endwith_len));
     }
@@ -285,9 +321,11 @@ int strend(const char *string, const char *endwith) {
 }
 
 /*
-* put message to console and exit program
+* @desc put message to console and exit program
+* @param const char *message - string with error message
 */
 void error(const char *message) {
+
     // put message to console
     puts(message);
 

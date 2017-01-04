@@ -1,3 +1,3 @@
-void vig_encipher(char[], char[]);
-void vig_decipher(char[], char[]);
-char* vig_passphrase(char[], char[]);
+void vig_encipher(char[], const char[]);
+void vig_decipher(char[], const char[]);
+int vig_passphrase(char[], const char[], const char[]);
