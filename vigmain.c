@@ -63,7 +63,7 @@ void error(const char*);
 * @desc entry point from this program
 * @param int argc - count of arguments
 * @param char **argv - all arguments as string
-* @return int - exit number mean, if the program finish successful
+* @return int - exit number to check wether the program finish successful
 */
 int main(int argc, char **argv) {
 
@@ -290,7 +290,7 @@ void file_write(const char *file_name, const char *content) {
     FILE *file_pointer = fopen(file_name, "w");
 
     // put char array to file
-    fprintf(file_pointer, content);
+    fputs(content, file_pointer);
 
     // close file
     fclose(file_pointer);
