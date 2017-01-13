@@ -12,7 +12,7 @@
 #include <string.h>
 
 // function definitions
-void cipher(char[], unsigned long, const char[], unsigned short);
+void cipher(char[], unsigned long, const char[], unsigned char);
 
 /**
 * @desc encipher byte array with vigenere
@@ -43,10 +43,10 @@ void vig_decipher(char bytes[], unsigned long bytes_len, const char passphrase[]
 * @param char bytes[] - byte array to de-/encipher
 * @param unsigned long bytes_len - len of byte array
 * @param const char passphrase[] - the key to de-/encipher bytes
-* @param unsigned short encipher - (bool) 1 for encipher, 0 for decipher
+* @param unsigned char encipher - (bool) 1 for encipher, 0 for decipher
 */
 void cipher(char bytes[], unsigned long bytes_len, const char passphrase[],
-    unsigned short encipher) {
+    unsigned char encipher) {
 
     // get size of passphrase
     size_t passphrase_len = strlen(passphrase);
