@@ -243,13 +243,13 @@ char* get_passphrase() {
 /**
 * @desc get content from file 'file_name' as char array
 * @param const char *file_name - file name(and path) to file for read
-* @return char* - content from file as char(byte) array
+* @param unsigned char **buffer - content from file as byte array
+* @param unsigned long *size - save len of buffer
 */
 void file_read(const char *file_name, unsigned char **buffer, unsigned long *size) {
 
     // declare variables to default value
     FILE *file_pointer = NULL;
-    *size = 0;
 
     // open file in read-only mode
     file_pointer = fopen(file_name, "rb");
@@ -281,7 +281,8 @@ void file_read(const char *file_name, unsigned char **buffer, unsigned long *siz
 /**
 * @desc write char array to file
 * @param const char *file_name - file name(and path) to file for write
-* @param const char *content - char(byte) array for write to file
+* @param unsigned char *buffer - char(byte) array for write to file
+* @param unsigned long buffer_len - len of buffer
 */
 void file_write(const char *file_name, unsigned char *buffer, unsigned long buffer_len) {
 
@@ -289,7 +290,7 @@ void file_write(const char *file_name, unsigned char *buffer, unsigned long buff
     FILE *file_pointer = fopen(file_name, "wb");
 
     // put char array to file
-    fwrite(buffer, buffer_len, 1, file_pointer);
+    fwrite(buffer, buffer_len, sizeof(unsigned char), file_pointer);
 
     // close file
     fclose(file_pointer);
@@ -299,7 +300,7 @@ void file_write(const char *file_name, unsigned char *buffer, unsigned long buff
 * @desc check end of string is equal
 * @param const char *string - full string
 * @param const char *endwith - string whose full string should end with
-* @return int - 1 if equal, 0 not equal
+* @return int - 1 if equal, 0 if not equal
 */
 int strend(const char *string, const char *endwith) {
 

@@ -17,6 +17,7 @@ void cipher(char[], unsigned long, const char[], unsigned short);
 /**
 * @desc encipher byte array with vigenere
 * @param char bytes[] - byte array to encipher
+* @param unsigned long bytes_len - len of byte array
 * @param const char passphrase[] - the key to encipher bytes
 */
 void vig_encipher(char bytes[], unsigned long bytes_len, const char passphrase[]) {
@@ -28,6 +29,7 @@ void vig_encipher(char bytes[], unsigned long bytes_len, const char passphrase[]
 /**
 * @desc decipher byte array with vigenere
 * @param char bytes[] - byte array to decipher
+* @param unsigned long bytes_len - len of byte array
 * @param const char passphrase[] - the key to decipher bytes
 */
 void vig_decipher(char bytes[], unsigned long bytes_len, const char passphrase[]) {
@@ -39,9 +41,8 @@ void vig_decipher(char bytes[], unsigned long bytes_len, const char passphrase[]
 /**
 * @desc decipher or encipher byte array with vigenere
 * @param char bytes[] - byte array to de-/encipher
-* @param int bytes_len - len of byte array
+* @param unsigned long bytes_len - len of byte array
 * @param const char passphrase[] - the key to de-/encipher bytes
-* @param int passphrase_len - len of passphrase array
 * @param unsigned short encipher - (bool) 1 for encipher, 0 for decipher
 */
 void cipher(char bytes[], unsigned long bytes_len, const char passphrase[],
@@ -70,7 +71,9 @@ void cipher(char bytes[], unsigned long bytes_len, const char passphrase[],
 * @desc find passphrase with clear and encrypted bytes
 * @param char passphrase[] - result will return in this char array
 * @param const char clear_bytes[] - clear byte array
+* @param unsigned long clear_bytes_len - len of clear byte array
 * @param const char encrypted_bytes[] - encrypted byte array
+* @param unsigned long encrypted_bytes_len - len of encrypted byte array
 * @return int - error code (0 - successful, 1 - not same len)
 */
 int vig_passphrase(char passphrase[], const unsigned char clear_bytes[],
