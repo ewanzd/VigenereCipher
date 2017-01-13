@@ -1,9 +1,10 @@
-/*
+/**
 * @author Danilo Wanzenried
 * @required viglib.c
 *
 * @desc File help to encipher and decipher files with 'vigenere cipher'. It is
 * possible too to hack the passphrase with clear and encrypted file.
+* https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher
 *
 * Examples:
 * Encipher(create for example image.png.encrypted)
@@ -54,12 +55,12 @@ typedef struct {
 vigargs* args_analyse(int, char**);
 void vig_run(vigargs*);
 char* get_passphrase();
-char* file_read(const char*);
-void file_write(const char*, const char*);
+void file_read(const char*, unsigned char**, unsigned long*);
+void file_write(const char*, unsigned char*, unsigned long);
 int strend(const char*, const char*);
 void error(const char*);
 
-/*
+/**
 * @desc entry point from this program
 * @param int argc - count of arguments
 * @param char **argv - all arguments as string
@@ -77,7 +78,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-/*
+/**
 * @desc analyse arguments from user and is responsible to check
 * if the input is valid.
 * @param int argc - count of arguments
@@ -135,7 +136,7 @@ vigargs* args_analyse(int argc, char **argv) {
     return app_arguments;
 }
 
-/*
+/**
 * @desc get data from file, de-/encipher data and save to new file
 * @param vigargs *args - structure with a description what to do
 */
@@ -144,37 +145,41 @@ void vig_run(vigargs *args) {
     // analyse
     switch (args->vigenere_mode) {
         case ENCIPHER: {
+            unsigned char *data_clear;
+            unsigned long data_clear_len;
 
             // get content(pointer to buffer stream) from file
-            char *data_clear = file_read(args->path_clear);
+            file_read(args->path_clear, &data_clear, &data_clear_len);
 
             // get passphrase from user
             char *passphrase = get_passphrase();
 
             // encipher file content with passphrase
-            vig_encipher(data_clear, passphrase);
+            vig_encipher(data_clear, data_clear_len, passphrase);
 
             // copy path to encrypt file to structure
-            // no new char array because save memory
+            // no new char array to save memory
             strcpy(args->path_cipher, args->path_clear);
 
             // attach '.encrypted' to path
             strcat(args->path_cipher, TXT_FILEATT);
 
             // output file with encrypted data
-            file_write(args->path_cipher, data_clear);
+            file_write(args->path_cipher, data_clear, data_clear_len);
             break;
         }
         case DECIPHER: {
+            unsigned char *data_cipher;
+            unsigned long data_cipher_len;
 
             // get pointer to buffer stream from file
-            char *data_cipher = file_read(args->path_cipher);
+            file_read(args->path_cipher, &data_cipher, &data_cipher_len);
 
             // get passphrase from user
             char *passphrase = get_passphrase();
 
             // decipher file content with passphrase
-            vig_decipher(data_cipher, passphrase);
+            vig_decipher(data_cipher, data_cipher_len, passphrase);
 
             // copy path to encrypt file to structure
             strcpy(args->path_clear, args->path_cipher);
@@ -186,22 +191,25 @@ void vig_run(vigargs *args) {
             args->path_clear[len - 10] = '\0';
 
             // output file with encrypted data
-            file_write(args->path_clear, data_cipher);
+            file_write(args->path_clear, data_cipher, data_cipher_len);
             break;
         }
         case HACK: {
+            unsigned char *data_clear, *data_cipher;
+            unsigned long data_clear_len, data_cipher_len;
 
             // get pointer to buffer stream from file with clear text
-            char *data_clear = file_read(args->path_clear);
+            file_read(args->path_clear, &data_clear, &data_clear_len);
 
             // get pointer to buffer stream from file with encrypted text
-            char *data_cipher = file_read(args->path_cipher);
+            file_read(args->path_cipher, &data_cipher, &data_cipher_len);
 
             // find passphrase with clear and encrypted text
             char *passphrase = (char*)malloc(sizeof(char) * MAXSIZE_PHRASE);
 
             // get passphrase with both byte arrays
-            int error_code = vig_passphrase(passphrase, data_clear, data_cipher);
+            int error_code = vig_passphrase(passphrase, data_clear, data_clear_len,
+                data_cipher, data_cipher_len);
 
             // error while get passphrase
             if(error_code != 0) error(TXT_FILESNOTSAMELEN);
@@ -213,7 +221,7 @@ void vig_run(vigargs *args) {
     }
 }
 
-/*
+/**
 * @desc get user input with passphrase as char array
 * @return char* - a string with passphrase from user
 */
@@ -232,20 +240,19 @@ char* get_passphrase() {
     return passphrase;
 }
 
-/*
+/**
 * @desc get content from file 'file_name' as char array
 * @param const char *file_name - file name(and path) to file for read
 * @return char* - content from file as char(byte) array
 */
-char* file_read(const char *file_name) {
+void file_read(const char *file_name, unsigned char **buffer, unsigned long *size) {
 
     // declare variables to default value
     FILE *file_pointer = NULL;
-    char *buffer = NULL;
-    size_t size = 0;
+    *size = 0;
 
     // open file in read-only mode
-    file_pointer = fopen(file_name, "r");
+    file_pointer = fopen(file_name, "rb");
 
     // can't open file(not available?)
     if (!file_pointer) {
@@ -256,47 +263,39 @@ char* file_read(const char *file_name) {
     fseek(file_pointer, 0L, SEEK_END);
 
     // get the buffer size
-    size = ftell(file_pointer);
+    *size = ftell(file_pointer);
 
     // set position of stream to the beginning
-    rewind(file_pointer);
+    fseek(file_pointer, 0L, SEEK_SET);
 
     // allocate the buffer
-    // size + 1 byte for the \0
-    buffer = malloc((size + 1) * sizeof(*buffer));
+    *buffer = (unsigned char*)malloc(*size * sizeof(unsigned char));
 
     // read the file into the buffer
-    // read 1 chunk of size bytes from file_pointer into buffer
-    fread(buffer, size, 1, file_pointer);
-
-    // NULL-terminate the buffer
-    buffer[size] = '\0';
+    fread(*buffer, *size, sizeof(unsigned char), file_pointer);
 
     // close file stream
     fclose(file_pointer);
-
-    // return char array
-    return buffer;
 }
 
-/*
+/**
 * @desc write char array to file
 * @param const char *file_name - file name(and path) to file for write
 * @param const char *content - char(byte) array for write to file
 */
-void file_write(const char *file_name, const char *content) {
+void file_write(const char *file_name, unsigned char *buffer, unsigned long buffer_len) {
 
     // Create file and open
-    FILE *file_pointer = fopen(file_name, "w");
+    FILE *file_pointer = fopen(file_name, "wb");
 
     // put char array to file
-    fputs(content, file_pointer);
+    fwrite(buffer, buffer_len, 1, file_pointer);
 
     // close file
     fclose(file_pointer);
 }
 
-/*
+/**
 * @desc check end of string is equal
 * @param const char *string - full string
 * @param const char *endwith - string whose full string should end with
@@ -320,7 +319,7 @@ int strend(const char *string, const char *endwith) {
     return 0;
 }
 
-/*
+/**
 * @desc put message to console and exit program
 * @param const char *message - string with error message
 */
