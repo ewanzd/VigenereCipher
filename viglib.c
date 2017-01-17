@@ -10,7 +10,6 @@
 */
 
 #include <string.h>
-#include <stdio.h>
 
 // function definitions
 void cipher(char[], unsigned long, const char[], unsigned char);
@@ -97,7 +96,6 @@ int vig_passphrase(char passphrase[], const unsigned char clear_bytes[],
     // find the length of the passphrase
     unsigned long i, j, last_equal;
     for (i = 0, j = 0, last_equal = 0; i < clear_bytes_len; i++) {
-        //printf("temp: %x, phrase: %x, i=%d, j=%d, last_equal=%d, text:%s\n", temp_bytes[i], passphrase[j], i, j, last_equal, passphrase);
 
         // if all elements was checked from existing passphrase, then set j to start
         if(j >= last_equal) j = 0;
