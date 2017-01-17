@@ -113,7 +113,7 @@ int vig_passphrase(char passphrase[], const unsigned char clear_bytes[],
                 last_equal++;
             }
 
-            // special case: if last and first are equal, then check char again
+            // special case: if last and first are equal, then check last char again
             if(passphrase[last_equal - 1] == passphrase[0]) i = --last_equal;
         } else {
 
