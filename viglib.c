@@ -10,7 +10,6 @@
 */
 
 #include <string.h>
-#include <stdio.h>
 
 // function definitions
 void cipher(char[], unsigned long, const char[], unsigned char);
