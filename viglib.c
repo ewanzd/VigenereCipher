@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include <stdio.h>
 
 // function definitions
 void cipher(char[], unsigned long, const char[], unsigned char);
@@ -93,32 +94,34 @@ int vig_passphrase(char passphrase[], const unsigned char clear_bytes[],
         temp_bytes[i] = (encrypted_bytes[i] - clear_bytes[i]) % 256;
     }
 
+    // bool to check if innerloop quit normal or with 'break'
+    unsigned char finished = 0;
+
     // find the length of the passphrase
-    unsigned long i, j, last_equal;
-    for (i = 0, j = 0, last_equal = 0; i < clear_bytes_len; i++) {
+    unsigned long i, j, last_equal = 0;
+    while (finished == 0) {
 
-        // if all elements was checked from existing passphrase, then set j to start
-        if(j >= last_equal) j = 0;
+        // loop every char until the sequences are difference
+        for (finished = 1, j = 0, i = last_equal; i < clear_bytes_len; j++, i++) {
 
-        // comparing if both char sequences are equal
-        if(passphrase[j] != temp_bytes[i]) {
+            // start again if phrase reach the end
+            if(j >= last_equal) j = 0;
 
-            // they weren't equal, so add all missing chars
-            while (last_equal <= i) {
+            // check wether both sequences are equal
+            if(passphrase[j] != temp_bytes[i]) {
 
-                // add char to passphrase
+                // they werent equal, so add new char to phrase
                 passphrase[last_equal] = temp_bytes[last_equal];
 
-                // increase length of passphrase
+                // to next char in phrase
                 last_equal++;
+
+                // start again
+                finished = 0;
+
+                // loop havent run to end
+                break;
             }
-
-            // special case: if last and first are equal, then check last char again
-            if(passphrase[last_equal - 1] == passphrase[0]) i = --last_equal;
-        } else {
-
-            // they were equal, so go to next byte
-            j++;
         }
     }
 
