@@ -1,7 +1,7 @@
 # Compiler to use
 CC=gcc
 # Pass flags to the compiler
-CFLAGS=-c -g
+CFLAGS=-g
 # Pass flags to the linker
 LDFLAGS=
 # All sources to compile
@@ -16,10 +16,10 @@ DELETECMD=del
 all: $(EXEC)
 
 $(EXEC): $(OBJECTS)
-	$(CC) -o $(EXEC) $(OBJECTS)  $(LDFLAGS)
+	$(CC) $(LDFLAGS) $^ -o $@
 
 .c.o:
-	$(CC) $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
 clean:
-	$(DELETECMD) -rf $(OBJECTS) $(EXEC)
+	$(DELETECMD) -rf $(OBJECTS)
