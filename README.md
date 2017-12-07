@@ -8,7 +8,7 @@ To run the application you need first a C compiler (e.g. visual studio, mingw or
 
 ## Console examples
 
-`image.png` is only a example file. In your case choice a own file to encrypt.
+`image.png` is only an example file. In your case choice a own file to encrypt.
 
 Encipher(will create image.png.encrypted)
 ```
